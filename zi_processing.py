@@ -128,6 +128,9 @@ def fit_lorentz_sweeper(df_in, showHTML = False, figure_name = 'temp'):
     p1_source = bkp.ColumnDataSource(df)
     p1.circle(x = 'frequency', y = 'r', source = p1_source, size = 10, 
             alpha = 0.5, legend = 'Data')
+    p1.line(df['frequency'], lorentz(solp, df['frequency']), color = 'red', 
+                   line_dash = 'dashed', line_width = 3, 
+                   legend = 'Fitted, Q = ' + str(round(solp[2],3)))
 
     p1.xaxis[0].axis_label = 'Frequency (Hz)'
     p1.yaxis[0].axis_label = 'Voltage (V)'

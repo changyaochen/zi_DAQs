@@ -9,7 +9,7 @@ This is my first try to do a open loop sweep
 def open_loop_sweep(device_id= 'dev267', demod_channel = 1, 
                     out_channel = 1, amplitude = 0.05, 
                     start_freq = 10e3, stop_freq = 11e3,
-                    out_range = 0.1, avg_sample = 10, avg_tc = 10,
+                    out_range = 0.1, avg_sample = 10, avg_tc = 15,
                     samplecount = 1000,
                     do_plot = False):
     import matplotlib.pyplot as plt
