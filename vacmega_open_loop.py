@@ -22,7 +22,8 @@ device_id= 'dev267'
 
 # ===== global setting =======
 vac_list = np.linspace(0.01, 0.21, 21)
-#vac_list = [0.1]  # for debug purpose
+samplecount = 2000
+#vac_list = [0.1]; samplecount = 100  # for debug purpose
 inplace_fit = True  # whether to do Lorentz fit for each sweep
 # ==============================
 
@@ -32,7 +33,11 @@ inplace_fit = True  # whether to do Lorentz fit for each sweep
 # 
 # with vac attached to the file name
 
+# initilization for the type_II data
 type_II = pd.DataFrame()
+# initialization for the fitted result
+fitted_result =[]
+# TODO: collect errors in the fitted results
 
 # only to extract certain fields from the raw output
 headers = ['frequency', 'x', 'y']
@@ -59,7 +64,7 @@ for vac in vac_list:
     result = open_loop_sweep(device_id = 'dev267', 
                              start_freq = 60.61e3, stop_freq = 60.66e3,
                              amplitude=vac,
-                             samplecount = 2000)
+                             samplecount = samplecount)
 
     type_I_temp = pd.DataFrame.from_dict({x: result[0][0][x] for x in headers})
     type_I_temp['vac'] = vac
@@ -69,9 +74,11 @@ for vac in vac_list:
                        index = False)
     # do the fit if chosen
     if inplace_fit:
-        zi_processing.fit_lorentz_sweeper(type_I_temp, showHTML = False, 
+        # fit the data to a Lorentz curve
+        A, f0, Q, bkg = zi_processing.fit_lorentz_sweeper(type_I_temp, showHTML = False, 
                                           figure_name = handle + '_' + str(vac))
-    
+        fitted_result.append([vac, f0, Q])
+        
     if type_II.size == 0:  # first time
         type_II = type_I_temp
     else:
@@ -80,6 +87,10 @@ for vac in vac_list:
 # save the type_II data
 type_II.to_csv(handle + '_vacmega.txt', sep = '\t', 
                index = False, headers = False)
+# save the fitted result
+fitted_result = pd.DataFrame(fitted_result, columns = ['vac(Vpp)', 'f0(Hz)', 'Q'])
+fitted_result.to_csv(handle + '_fitted_results.txt', sep = '\t', 
+               index = False)
         
 
 # return to the parent folder
