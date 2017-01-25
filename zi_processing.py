@@ -82,8 +82,6 @@ def open_loop_zi(folder, fit_lorentz = False, showHTML = False):
   else:
     bkp.save(p1)
     
-    
-  # TODO: get the error bound
   
 def fit_lorentz_sweeper(df_in, showHTML = False, figure_name = 'temp'):
     """
@@ -109,8 +107,8 @@ def fit_lorentz_sweeper(df_in, showHTML = False, figure_name = 'temp'):
     f0_guess = df['frequency'].ix[np.argmax(Amp)]
     bkg_guess = 0.00001
     p_guess = [max(Amp) * Q_guess, f0_guess, Q_guess, bkg_guess]
-    solp, pcov, infodict, errmsg, success\
-    = sp.optimize.leastsq(errorfunc, 
+    p_fit, pcov, infodict, errmsg, success\
+    = sp.optimize.leastsq(errorfunc, # errorfunc (p, x, y_data)
                     p_guess, 
                     args=(df['frequency'], Amp),
                     Dfun=None,
@@ -121,6 +119,33 @@ def fit_lorentz_sweeper(df_in, showHTML = False, figure_name = 'temp'):
                     epsfcn=1e-10,
                     factor=0.1)
     
+    # TODO: ========== get the error bound ==========
+    # following the info from this link:
+    # http://stackoverflow.com/questions/14581358/getting-standard-errors-on-fitted-parameters-using-the-optimize-leastsq-method-i
+    # I will also assume the  # of data points is larger than the # of fitting
+    # parameters
+    
+    # first calculate the residual variance s_sq
+    s_sq = (errorfunc(p_fit, df['frequency'], Amp)**2).sum()\
+                      /(len(Amp) - len(p_fit))
+#    print('residual variance is: ', s_sq)
+
+    # update the pcov
+    pcov = pcov * s_sq
+    
+    # calculate the sqrt of the diagonal component of pcov
+    p_err = []
+    for i in range(len(p_fit)):
+      try:
+        p_err.append(np.sqrt(np.absolute(pcov[i][i])))
+      except:
+        p_err.append(0.0)
+    
+    # convert to ndarray, for consistency    
+    p_err = np.array(p_err)
+    
+    #========== end ==========
+    
     bkp.output_file(figure_name + '.html')
     # start plotting!
     p1 = bkp.figure(plot_width=800, plot_height=300, title = figure_name, 
@@ -128,9 +153,9 @@ def fit_lorentz_sweeper(df_in, showHTML = False, figure_name = 'temp'):
     p1_source = bkp.ColumnDataSource(df)
     p1.circle(x = 'frequency', y = 'r', source = p1_source, size = 10, 
             alpha = 0.5, legend = 'Data')
-    p1.line(df['frequency'], lorentz(solp, df['frequency']), color = 'red', 
+    p1.line(df['frequency'], lorentz(p_fit, df['frequency']), color = 'red', 
                    line_dash = 'dashed', line_width = 3, 
-                   legend = 'Fitted, Q = ' + str(round(solp[2],3)))
+                   legend = 'Fitted, Q = ' + str(round(p_fit[2],3)))
 
     p1.xaxis[0].axis_label = 'Frequency (Hz)'
     p1.yaxis[0].axis_label = 'Voltage (V)'
@@ -139,7 +164,7 @@ def fit_lorentz_sweeper(df_in, showHTML = False, figure_name = 'temp'):
     else:
         bkp.save(p1)
     
-    return solp
+    return p_fit, p_err
     
   
   
