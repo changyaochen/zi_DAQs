@@ -84,7 +84,8 @@ def open_loop_zi(folder, fit_lorentz = False, showHTML = False):
     
   
 def fit_lorentz_sweeper(df_in, showHTML = False, 
-                        figure_name = 'temp', native_zi = False):
+                        figure_name = 'temp', native_zi = False,
+                        zoom_in_fit = True):
     """
     This is to fit the data obtained by sweeper
     The input is a dataframe, which needs to have
@@ -125,8 +126,11 @@ def fit_lorentz_sweeper(df_in, showHTML = False,
     f_bound = 15*f0_guess / Q_guess
     mask = (df[freq_header] < f0_guess + f_bound) \
            & ((df[freq_header] > f0_guess - f_bound))
-#    print(sum(mask))
-    df2 = df[mask]
+    if zoom_in_fit:
+      df2 = df[mask]
+    else:
+      df2 = df
+      
     bkg_guess = 0.00001
     p_guess = [max(Amp) * Q_guess, f0_guess, Q_guess, bkg_guess]
     p_fit, pcov, infodict, errmsg, success\
