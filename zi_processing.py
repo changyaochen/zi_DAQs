@@ -74,7 +74,8 @@ def open_loop_zi(folder, fit_lorentz = False, showHTML = False):
                    legend = 'Fitted, Q = ' + str(round(solp[2],3)))
     
     print('Q = ', round(solp[2],3))
-    print('Ringdown time constant = ' + str(round(solp[2]/np.pi/solp[1], 3)) + 's')
+    print('Calculate ringdown time constant = ' 
+          + str(round(solp[2]/np.pi/solp[1], 3)) + 's')
   
   bkp.output_file(folder + '.html')
   if showHTML:
