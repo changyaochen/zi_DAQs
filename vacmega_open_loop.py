@@ -21,7 +21,7 @@ device_id= 'dev267'
 
 
 # ===== global setting =======
-vac_list = np.linspace(0.01, 0.21, 21)
+vac_list = np.linspace(0.01, 0.51, 25)
 samplecount = 2000
 #vac_list = [0.1]; samplecount = 100  # for debug purpose
 inplace_fit = True  # whether to do Lorentz fit for each sweep
@@ -35,9 +35,8 @@ inplace_fit = True  # whether to do Lorentz fit for each sweep
 
 # initilization for the type_II data
 type_II = pd.DataFrame()
-# initialization for the fitted result
-fitted_result =[]
-# TODO: collect errors in the fitted results
+# initialize output file
+fitted_results = []
 
 # only to extract certain fields from the raw output
 headers = ['frequency', 'x', 'y']
@@ -62,9 +61,9 @@ for vac in vac_list:
     # the return result is a list, and its [0][0] element is the dict
     # that is of interest
     result = open_loop_sweep(device_id = 'dev267', 
-                             start_freq = 60.61e3, stop_freq = 60.66e3,
-                             amplitude=vac,
-                             samplecount = samplecount)
+                             start_freq = 27.00e3, stop_freq = 40.00e3,
+                             amplitude=vac, avg_sample= 3,
+                             samplecount = samplecount, )
 
     type_I_temp = pd.DataFrame.from_dict({x: result[0][0][x] for x in headers})
     type_I_temp['vac'] = vac
@@ -75,9 +74,12 @@ for vac in vac_list:
     # do the fit if chosen
     if inplace_fit:
         # fit the data to a Lorentz curve
-        A, f0, Q, bkg = zi_processing.fit_lorentz_sweeper(type_I_temp, showHTML = False, 
-                                          figure_name = handle + '_' + str(vac))
-        fitted_result.append([vac, f0, Q])
+        p_fit, p_err = zi_processing.fit_lorentz_sweeper(type_I_temp, showHTML = False, 
+                                          figure_name = handle + '_' + str(vac), 
+                                          zoom_in_fit = False)
+        A, f0, Q, bkg = [x for x in p_fit]
+        A_err, f0_err, Q_err, bkg_err = [x for x in p_err]
+        fitted_results.append([vac, f0, f0_err, Q, Q_err])
         
     if type_II.size == 0:  # first time
         type_II = type_I_temp
@@ -88,7 +90,8 @@ for vac in vac_list:
 type_II.to_csv(handle + '_vacmega.txt', sep = '\t', 
                index = False, headers = False)
 # save the fitted result
-fitted_result = pd.DataFrame(fitted_result, columns = ['vac(Vpp)', 'f0(Hz)', 'Q'])
+fitted_result = pd.DataFrame(fitted_result, columns = ['vac(V)', 'f0(Hz)', 'f0_err(Hz)',
+                               'Q', 'Q_err'])
 fitted_result.to_csv(handle + '_fitted_results.txt', sep = '\t', 
                index = False)
         
