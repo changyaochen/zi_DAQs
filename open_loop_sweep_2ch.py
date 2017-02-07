@@ -11,13 +11,14 @@ but only output of ch1 is on
 and the reference of ch2 is set to from ch1 (selected manually)
 """
 
-def open_loop_sweep_ch2(device_id= 'dev267', 
+def open_loop_sweep_2ch(device_id= 'dev267', 
                         demod_channel_1 = 1, out_channel_1 = 1, 
                         demod_channel_2 = 4, out_channel_2 = 2,
                         amplitude = 0.05, 
                         start_freq = 10e3, stop_freq = 11e3,
                         out_range = 0.1, avg_sample = 10, avg_tc = 15,
                         samplecount = 1000,
+                        tc = 0.005, rate = 2000, 
                         do_plot = False):
 
     import matplotlib.pyplot as plt
@@ -44,8 +45,9 @@ def open_loop_sweep_ch2(device_id= 'dev267',
     
     
     out_mixer_channel = zhinst.utils.default_output_mixer_channel(props)
-    rate=2000  # streaming sampling rate
-    tc=0.005  # equil. to LPF BW
+#    # now the below attributes are passed in as arguments 
+#    rate=2000  # streaming sampling rate
+#    tc=0.005  # equil. to LPF BW
     
         # ===== setting demod channel 2 =====
     c=str(demod_channel_2-1)
@@ -220,7 +222,7 @@ def open_loop_sweep_ch2(device_id= 'dev267',
     while not sweeper.finished():  # Wait until the sweep is complete, with timeout.
         time.sleep(0.2)
         progress = sweeper.progress()
-        if progress[0]%0.05 == 0:
+        if 100*progress[0]%5.0 == 0.0:
             print("Individual sweep progress: {:.2%}.".format(progress[0]))
         # Here we could read intermediate data via:
         # data = sweeper.read(True)...
@@ -305,6 +307,8 @@ def open_loop_sweep_ch2(device_id= 'dev267',
     return samples_1, samples_2
 
 if __name__ == '__main__':
-   open_loop_sweep_ch2(do_plot=True)
+   open_loop_sweep_2ch(samplecount=100,
+                       avg_sample = 1, avg_tc = 5, 
+                       tc = 1.0/300/2/np.pi, do_plot=True)
     
 
