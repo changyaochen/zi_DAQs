@@ -167,8 +167,8 @@ def open_loop_sweep(device_id= 'dev267', demod_channel = 1,
     while not sweeper.finished():  # Wait until the sweep is complete, with timeout.
         time.sleep(0.2)
         progress = sweeper.progress()
-        print('\n'*100)  # to clear the screen
-        print("Individual sweep progress: {:.2%}.".format(progress[0]))
+        if 100*progress[0]%5.0 == 0.0:
+            print("Individual sweep progress: {:.2%}.".format(progress[0]))
         # Here we could read intermediate data via:
         # data = sweeper.read(True)...
         # and process it while the sweep is completing.
