@@ -102,12 +102,12 @@ for vac in vac_list:
         type_II_ch1 = type_II_ch1.append(type_I_temp_ch1, ignore_index = True)
         type_II_ch2 = type_II_ch2.append(type_I_temp_ch2, ignore_index = True)
         
-# save the type_II_ch1 data
-type_II_ch1.to_csv(handle + '_ch1_vacmega.txt', sep = '\t', 
-               index = False, headers = False)
-# save the type_II_ch2 data
-type_II_ch2.to_csv(handle + '_ch2_vacmega.txt', sep = '\t', 
-               index = False, headers = False)
+    # save the type_II_ch1 data
+    type_II_ch1.to_csv(handle + '_ch1_vacmega.txt', sep = '\t', 
+                   index = False, headers = False)
+    # save the type_II_ch2 data
+    type_II_ch2.to_csv(handle + '_ch2_vacmega.txt', sep = '\t', 
+                   index = False, headers = False)
 
 # save the fitted result
 if inplace_fit:
