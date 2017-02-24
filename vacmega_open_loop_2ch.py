@@ -21,9 +21,14 @@ device_id= 'dev267'
 
 
 # ===== global setting =======
+_debug_ = True   
 vac_list = np.linspace(0.01, 0.51, 2)
-samplecount = 2000
-#vac_list = [0.1]; samplecount = 100  # for debug purpose
+start_freq = 27.00e3
+stop_freq = 40.00e3
+samplecount = 13000
+avg_sample= 3
+if _debug_:
+    vac_list = [0.1]; samplecount = 100  # for debug purpose
 inplace_fit = False  # whether to do Lorentz fit for each sweep
 # ==============================
 
@@ -63,8 +68,8 @@ for vac in vac_list:
     # the return result is a list, and its [0][0] element is the dict
     # that is of interest
     result_1, result_2 = open_loop_sweep_2ch(device_id = 'dev267', 
-                                             start_freq = 27.00e3, stop_freq = 40.00e3,
-                                             amplitude=vac, avg_sample= 3,
+                                             start_freq = start_freq, stop_freq = stop_freq,
+                                             amplitude=vac, avg_sample= avg_sample,
                                              samplecount = samplecount)
 
     type_I_temp_ch1 = pd.DataFrame.from_dict({x: result_1[0][0][x] for x in headers})
@@ -116,6 +121,25 @@ if inplace_fit:
     fitted_results_ch1.to_csv(handle + '_ch1_fitted_results.txt', sep = '\t', 
                    index = False)
         
+# I need to somehow save the experiment parameters...
+parameters = { # default values
+        'avg_sample': 10, 
+        'avg_tc': 15,
+        'samplecount': 1000,
+        'tc': 0.005, 
+        'rate': 2000
+        }
+# update the default values
+parameters['samplecount'] = samplecount 
+parameters['start_freq'] =  start_freq
+parameters['stop_freq'] =  stop_freq
+parameters['avg_sample'] =  avg_sample
+          
+# save the parameter!
+with open('sweep_parameters.txt','w') as f:
+    for key in parameters:
+        f.write('{:20} : {}\n'.format(key, parameters[key]))
+    
 
 # return to the parent folder
 os.chdir('..')
