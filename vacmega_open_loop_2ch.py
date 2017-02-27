@@ -32,6 +32,21 @@ if _debug_:
 inplace_fit = False  # whether to do Lorentz fit for each sweep
 # ==============================
 
+# I need to somehow save the experiment parameters...
+parameters = { # default values
+        'avg_sample': 10, 
+        'avg_tc': 15,
+        'samplecount': 1000,
+        'tc': 0.005, 
+        'rate': 2000
+        }
+# update the default values
+parameters['samplecount'] = samplecount 
+parameters['start_freq'] =  start_freq
+parameters['stop_freq'] =  stop_freq
+parameters['avg_sample'] =  avg_sample
+
+
 # I will save the output into 2 types of files:
 # for the first type, each vac has its own file
 # for the second type is the usual megasweep format (single file)
@@ -121,19 +136,6 @@ if inplace_fit:
     fitted_results_ch1.to_csv(handle + '_ch1_fitted_results.txt', sep = '\t', 
                    index = False)
         
-# I need to somehow save the experiment parameters...
-parameters = { # default values
-        'avg_sample': 10, 
-        'avg_tc': 15,
-        'samplecount': 1000,
-        'tc': 0.005, 
-        'rate': 2000
-        }
-# update the default values
-parameters['samplecount'] = samplecount 
-parameters['start_freq'] =  start_freq
-parameters['stop_freq'] =  stop_freq
-parameters['avg_sample'] =  avg_sample
           
 # save the parameter!
 with open('sweep_parameters.txt','w') as f:
