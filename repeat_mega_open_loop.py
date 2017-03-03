@@ -6,7 +6,7 @@ The purpose is to see the drift of the system with time
 @author: changyao chen
 """
 
-from open_loop_sweep import *
+from open_loop_sweep import open_loop_sweep
 import os
 import numpy as np
 import pandas as pd
@@ -18,13 +18,13 @@ os.chdir(dname)
 device_id= 'dev267'
 
 
-# ===== global setting =======
+# ============================= global setting ===============================
 take_list = np.linspace(1, 50, 50)
 samplecount = 1000
 vac = 0.03
 #vac_list = [0.1]; samplecount = 100  # for debug purpose
 inplace_fit = True  # whether to do Lorentz fit for each sweep
-# ==============================
+# ============================================================================
 
 # I will save the output into 2 types of files:
 # for the first type, each vac has its own file
@@ -60,10 +60,11 @@ for take in take_list:
     # run one open loop sweep
     # the return result is a list, and its [0][0] element is the dict
     # that is of interest
-    result = open_loop_sweep(device_id = 'dev267', 
-                             start_freq = 27.62e3, stop_freq = 27.70e3,
-                             amplitude=vac, avg_sample=3, avg_tc=5,
-                             samplecount = samplecount)
+    result =  open_loop_sweep(device_id= 'dev267', demod_channel = 4, 
+                   out_channel = 2, sigin_channel = 2, amplitude = vac, 
+                    start_freq = 31.8e3, stop_freq = 31.9e3,
+                    out_range = 0.1, avg_sample = 5, avg_tc = 15,
+                    samplecount = samplecount)
 
     type_I_temp = pd.DataFrame.from_dict({x: result[0][0][x] for x in headers})
     type_I_temp['take'] = take

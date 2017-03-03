@@ -7,7 +7,7 @@ This is my first try to do a open loop sweep
 """
 
 def open_loop_sweep(device_id= 'dev267', demod_channel = 1, 
-                    out_channel = 1, amplitude = 0.05, 
+                    out_channel = 1, sigin_channel = 1, amplitude = 0.05, 
                     start_freq = 10e3, stop_freq = 11e3,
                     out_range = 0.1, avg_sample = 10, avg_tc = 15,
                     samplecount = 1000,
@@ -39,6 +39,7 @@ def open_loop_sweep(device_id= 'dev267', demod_channel = 1,
     tc=0.005  # equil. to LPF BW
     c=str(demod_channel-1)
     o_c = str(out_channel-1)
+    i_c = str(sigin_channel-1)
     general_setting = [
         [['/', device, '/demods/0/trigger'], 0],
         [['/', device, '/demods/1/trigger'], 0],
@@ -56,15 +57,15 @@ def open_loop_sweep(device_id= 'dev267', demod_channel = 1,
     # Set test settings
     exp_sigOutIn_setting = [
             # input (demods) settings
-       [['/', device, '/sigins/',c,'/diff'], 1],  # diff input on
-       [['/', device, '/sigins/',c,'/imp50'], 1],  # 50 Ohm input impedance
-       [['/', device, '/sigins/',c,'/ac'], 1],  # input ac coupling
+       [['/', device, '/sigins/',i_c,'/diff'], 1],  # diff input on
+       [['/', device, '/sigins/',i_c,'/imp50'], 1],  # 50 Ohm input impedance
+       [['/', device, '/sigins/',i_c,'/ac'], 1],  # input ac coupling
+       [['/', device, '/plls/', i_c,'/enable'], 0],  # set osc ref to internal
     #       [['/', device, '/sigins/',c,'/range'], 1],  # I will set the range manually
        [['/', device, '/demods/',c,'/order'], 8],
        [['/', device, '/demods/',c,'/timeconstant'], tc],  # equil. to LPF BW
        [['/', device, '/demods/',c,'/rate'], rate],  # streaming rate
        [['/', device, '/demods/',c,'/adcselect'], demod_channel-1],  # adc select
-       [['/', device, '/plls/', c,'/enable'], 0],  # set osc ref to internal
        [['/', device, '/demods/',c,'/oscselect'], demod_channel-1],  # osc select
        [['/', device, '/demods/',c,'/harmonic'], 1],  # demods order
        # output settings
@@ -80,7 +81,7 @@ def open_loop_sweep(device_id= 'dev267', demod_channel = 1,
     output_range = list(daq.get('/'+device+'/sigouts/'+o_c+'/range', True).values())[0][0]  
     exp_sigOutIn_setting.extend([
             # set output amplitude
-            [['/', device, '/sigouts/',o_c,'/amplitudes/',str(out_mixer_channel)], 
+            [['/', device, '/sigouts/',o_c,'/amplitudes/',str(out_channel - 1 + 6)], 
               amplitude/output_range],  
             [['/', device, '/sigouts/',o_c,'/on'], 1]  # turn output on
                                 ])                    
@@ -228,6 +229,11 @@ def open_loop_sweep(device_id= 'dev267', demod_channel = 1,
     
 
 if __name__ == '__main__':
-   open_loop_sweep()
+   open_loop_sweep(device_id= 'dev267', demod_channel = 4, 
+                   out_channel = 2, sigin_channel = 2, amplitude = 0.03, 
+                    start_freq = 31.8e3, stop_freq = 31.9e3,
+                    out_range = 0.1, avg_sample = 5, avg_tc = 15,
+                    samplecount = 1000,
+                    do_plot =True)
     
 
