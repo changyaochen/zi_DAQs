@@ -7,13 +7,22 @@ It is developed from opne_loop_sweep(), but the difference is that
 this code should allow me to record data from more than one demods!
 Ideally, I want to record data from ch1 and ch2 simultaneously
 
-but only output of ch1 is on
-and the reference of ch2 is set to from ch1 (selected manually)
+the output of out_channel_1 is on
+the output of out_channel_2 is not touched (i.e. not changed)
+the demod_channel_1 is on
+the demod_channel_2 is on
+The references of demod_channel_1 is set to 'internal'
+The references of demod_channel_2 is set manually 
+
+Return:
+sample_1 (type dict) from demod_channel_2
+sample_2 (type dict) from demod_channel_2
 """
+import numpy as np
 
 def open_loop_sweep_2ch(device_id= 'dev267', 
-                        demod_channel_1 = 1, out_channel_1 = 1, 
-                        demod_channel_2 = 4, out_channel_2 = 2,
+                        demod_channel_1 = 1, out_channel_1 = 1, in_channel_1 = 1, 
+                        demod_channel_2 = 4, out_channel_2 = 2, in_channel_2 = 2,
                         amplitude = 0.05, 
                         start_freq = 10e3, stop_freq = 11e3,
                         out_range = 0.1, avg_sample = 10, avg_tc = 15,
@@ -52,6 +61,7 @@ def open_loop_sweep_2ch(device_id= 'dev267',
         # ===== setting demod channel 2 =====
     c=str(demod_channel_2-1)
     o_c = str(out_channel_2-1)
+    i_c = str(in_channel_2-1)
     general_setting = [
         [['/', device, '/demods/0/trigger'], 0],
         [['/', device, '/demods/1/trigger'], 0],
@@ -68,9 +78,9 @@ def open_loop_sweep_2ch(device_id= 'dev267',
     # Set test settings
     exp_sigOutIn_setting = [
             # input (demods) settings
-       [['/', device, '/sigins/1/diff'], 1],  # diff input off
-       [['/', device, '/sigins/1/imp50'], 1],  # 50 Ohm input impedance
-       [['/', device, '/sigins/1/ac'], 1],  # input ac coupling
+       [['/', device, '/sigins/', i_c, '/diff'], 1],  # diff input off
+       [['/', device, '/sigins/', i_c, '/imp50'], 1],  # 50 Ohm input impedance
+       [['/', device, '/sigins/', i_c, '/ac'], 1],  # input ac coupling
        [['/', device, '/demods/',c,'/order'], 8],
        [['/', device, '/demods/',c,'/timeconstant'], tc],  # equil. to LPF BW
        [['/', device, '/demods/',c,'/rate'], rate],  # streaming rate
@@ -84,6 +94,7 @@ def open_loop_sweep_2ch(device_id= 'dev267',
     # ===== setting demod channel 1 =====
     c=str(demod_channel_1-1)
     o_c = str(out_channel_1-1)
+    i_c = str(in_channel_1-1)
     general_setting = [
         [['/', device, '/demods/0/trigger'], 0],
         [['/', device, '/demods/1/trigger'], 0],
@@ -101,18 +112,18 @@ def open_loop_sweep_2ch(device_id= 'dev267',
     # Set test settings
     exp_sigOutIn_setting = [
             # input (demods) settings
-       [['/', device, '/sigins/',c,'/diff'], 1],  # diff input on
-       [['/', device, '/sigins/',c,'/imp50'], 1],  # 50 Ohm input impedance
-       [['/', device, '/sigins/',c,'/ac'], 1],  # input ac coupling
+       [['/', device, '/sigins/',i_c,'/diff'], 1],  # diff input on
+       [['/', device, '/sigins/',i_c,'/imp50'], 1],  # 50 Ohm input impedance
+       [['/', device, '/sigins/',i_c,'/ac'], 1],  # input ac coupling
+       [['/', device, '/plls/', i_c,'/enable'], 0],  # set osc ref to internal
     #       [['/', device, '/sigins/',c,'/range'], 1],  # I will set the range manually
        [['/', device, '/demods/',c,'/order'], 8],
        [['/', device, '/demods/',c,'/timeconstant'], tc],  # equil. to LPF BW
        [['/', device, '/demods/',c,'/rate'], rate],  # streaming rate
        [['/', device, '/demods/',c,'/adcselect'], demod_channel_1-1],  # adc select
-       [['/', device, '/plls/', c,'/enable'], 0],  # set osc ref to internal
        [['/', device, '/demods/',c,'/oscselect'], demod_channel_1-1],  # osc select
        [['/', device, '/demods/',c,'/harmonic'], 1],  # demods order
-       # output settings
+#       # output settings
        [['/', device, '/sigouts/',o_c,'/add'], 0],  # output, no add
        [['/', device, '/sigouts/',o_c,'/on'], 0],  # turn output off first
     #           [['/', device, '/sigouts/',c,'/enables/',c], 1],  
@@ -307,8 +318,14 @@ def open_loop_sweep_2ch(device_id= 'dev267',
     return samples_1, samples_2
 
 if __name__ == '__main__':
-   open_loop_sweep_2ch(samplecount=100,
-                       avg_sample = 1, avg_tc = 5, 
-                       tc = 1.0/300/2/np.pi, do_plot=True)
+   open_loop_sweep_2ch(device_id= 'dev267', 
+                        demod_channel_1 = 4, out_channel_1 = 2, in_channel_1 = 2, 
+                        demod_channel_2 = 1, out_channel_2 = 1, in_channel_2 = 1, 
+                        amplitude = 0.1, 
+                        start_freq = 31.84e3, stop_freq = 31.87e3,
+                        out_range = 0.1, avg_sample = 1, avg_tc = 15,
+                        samplecount = 1000,
+                        tc = 0.005, rate = 2000, 
+                        do_plot = True)
     
 
