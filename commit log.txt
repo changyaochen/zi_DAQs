@@ -1,3 +1,7 @@
+3/6/2017
+-	modified the pump_probe script. so that during the probe processing, the
+data from the pumping channel is also recorded.
+
 3/3/2017
 -	added pump probe code
 -	minor bug fixes for open_loop_sweep()
