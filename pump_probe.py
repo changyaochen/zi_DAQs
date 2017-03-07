@@ -71,7 +71,7 @@ result_pre = open_loop_sweep(device_id= 'dev267', demod_channel = pump_in_demod,
 # save the 'pre' data
 headers = ['frequency', 'x', 'y']
 data_pre_1 = pd.DataFrame.from_dict({x: result_pre[0][0][x] for x in headers})
-data_pre_1['r'] = np.sqrt(data_pre_1['x']**2 + data_pre_1['x']**2)
+data_pre_1['r'] = np.sqrt(data_pre_1['x']**2 + data_pre_1['y']**2)
 data_pre_1.to_csv(handle + '_ch1_pre.txt', sep = '\t', index = False)
 
 # make plot
@@ -111,7 +111,7 @@ for freq in pump_freqs:
     # save data
     # save the single probe data
     data_probe = pd.DataFrame.from_dict({x: result[0][0][x] for x in headers})
-    data_probe['r'] = np.sqrt(data_probe['x']**2 + data_probe['x']**2)
+    data_probe['r'] = np.sqrt(data_probe['x']**2 + data_probe['y']**2)
     data_probe.to_csv(handle + '_probe_pump_at_'+str(round(freq,2))+'Hz.txt', 
                       sep = '\t', index = False)
     if inplace_fit:
@@ -152,7 +152,7 @@ result_post = open_loop_sweep(device_id= 'dev267', demod_channel = pump_in_demod
 # save the 'pre' data
 headers = ['frequency', 'x', 'y']
 data_post_1 = pd.DataFrame.from_dict({x: result_post[0][0][x] for x in headers})
-data_post_1['r'] = np.sqrt(data_post_1['x']**2 + data_post_1['x']**2)
+data_post_1['r'] = np.sqrt(data_post_1['x']**2 + data_post_1['y']**2)
 data_post_1.to_csv(handle + '_ch1_post.txt', sep = '\t', index = False)
 
 # make plot
