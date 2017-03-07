@@ -81,7 +81,7 @@ result_pre = open_loop_sweep(device_id= 'dev267', demod_channel = pump_in_demod,
 # save the 'pre' data
 headers = ['frequency', 'x', 'y']
 data_pre_1 = pd.DataFrame.from_dict({x: result_pre[0][0][x] for x in headers})
-data_pre_1['r'] = np.sqrt(data_pre_1['x']**2 + data_pre_1['x']**2)
+data_pre_1['r'] = np.sqrt(data_pre_1['x']**2 + data_pre_1['y']**2)
 data_pre_1.to_csv(handle + '_ch1_pre.txt', sep = '\t', index = False)
 
 # make plot
