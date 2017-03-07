@@ -1,3 +1,6 @@
+3/7/2017
+- add zoomFFT after the probe step
+
 3/6/2017
 -	modified the pump_probe script. so that during the probe processing, the
 data from the pumping channel is also recorded.
